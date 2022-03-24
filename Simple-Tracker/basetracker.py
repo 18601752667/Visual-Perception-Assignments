@@ -83,15 +83,6 @@ class BaseTracker:
         This is the measure function you need to code
         you should use self.measure in self.track to simplify your code
         """
-        # print(len(a))
-        # print(len(a[0]))
-        # ret = 0
-        # for i in range(self._tmpl_sz[0]):
-        #     for j in range(self._tmpl_sz[1]):
-        #        ret += (a[i][j] - b[i][j]) * (a[i][j] - b[i][j])
-        #
-        # return ret
-        # los = sum(sum((a - b) ** 2))
         los = (np.sum((a - b) ** 2))
         return los
 
@@ -100,19 +91,12 @@ class BaseTracker:
         this is the main place you need to code
         please check ln.117 to see what's the input of this function
         """
-        ind_x, ind_y, ind_s = 0, 0, 1.0
 
-
-        # print(self._tmpl)
         minmse = 1e8
-        # retx, rety = search_region[2]/2, search_region[3]/2
         retx, rety = 0,0
-        ind_x, ind_y, ind_s = 25, 25, 1.0
 
         listi = self.getSearchIdx(int(search_region[2]/2))  # 获取search region的采样，中间密，两边疏
         listj = self.getSearchIdx(int(search_region[3]/2))
-
-        # print(listi)
 
         # for i in range(0, int(search_region[2]/2), 2):
         #     for j in range(0, int(search_region[3] / 2), 2):
@@ -122,16 +106,14 @@ class BaseTracker:
                 mse = self.measure(self._tmpl, new)
                 # print("i", i)
                 # print('mse', mse)
-
                 if mse < minmse:
                     minmse = mse
                     retx = i
                     rety = j
 
         # print("ret", retx,'/', int(search_region[2]/2) , rety, '/', int(search_region[3]/2))
-        return retx, rety, 1.0025  # 返回目标区域的左上角坐标（相对于search region的），超参调了一个1.002的roi scale增长率
-        # return retx-self._roi[0], rety-self._roi[1], 1.0
-        # return ind_x+1, ind_y+1, ind_s
+        return retx, rety, 1.0025  # 返回目标区域的左上角坐标（相对于search region的），超参调了一个1.0025的roi scale增长率
+
 
     def update_model(self, x, train_interp_factor):
         """
@@ -167,14 +149,14 @@ class BaseTracker:
         # delta_x and delta_y we want to estimate
         # delta = (np.array(loc_pos[:2]) - self._tmpl_sz / 2)
         delta = (np.array(loc_pos[:2]) - np.array(self._roi[2:]) / 2)  # 与原roi左上角坐标的相对差值
-        print('delta', delta)
+        # print('delta', delta)
 
         # scale between the search_roi and our template
         scale = loc_pos[2] * np.array(search_rect[2:]).astype(float) / (np.array(self._tmpl_sz) * 2)
         # back to the original size
         delta = delta * scale
 
-        print("delta * scale", delta)
+        # print("delta * scale", delta)
 
         # add the delta to original position
         self._roi[0] = self._roi[0] + delta[0]
